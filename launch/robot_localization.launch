@@ -8,15 +8,7 @@
     <arg name="imu_ignore_acc"          default="true" />
     <arg name="imu_remove_gravitational_acceleration" default="false" />
 
-        <!--IMU Filter Madgwick
-    <node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
-        <param name="use_mag" value="true" />
-        <param name="publish_tf" type="bool" value="false" />
-        <param name="world_frame" type="string" value="enu" />
-        <remap from="/imu/data_raw" to="/imu/data" />
-    </node>-->
-
- <!-- Odometry fusion (EKF), refer to demo launch file in robot_localization for more info -->
+ <!-- Odometry fusion (UKF), refer to demo launch file in robot_localization for more info -->
   <node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization" clear_params="true" output="screen">
 
       <param name="frequency" value="50"/>
@@ -73,42 +65,6 @@
       <!-- ======== ADVANCED PARAMETERS ======== -->
       <param name="odom0_queue_size" value="5"/>
       <param name="imu0_queue_size" value="50"/> 
-
-      <!-- The values are ordered as x, y, z, roll, pitch, yaw, vx, vy, vz,
-           vroll, vpitch, vyaw, ax, ay, az. 
-      <rosparam param="process_noise_covariance">[0.005, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0.005, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0.006, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0.003, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0.003, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0.006, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0.0025, 0,     0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0.0025, 0,    0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0,     0.004, 0,    0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0.001, 0,    0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0.001, 0,    0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.002, 0,    0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.001, 0,    0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.001, 0,
-                                                  0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.0015]</rosparam>
-
--->      <!-- The values are ordered as x, y,
-           z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az. 
-           <rosparam param="initial_estimate_covariance">[1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-                                                          0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-                                                          0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-                                                          0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-                                                          0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
-                                                          0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,     0,     0,     0,    0,    0,
-                                                          0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,     0,     0,     0,    0,    0,
-                                                          0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,     0,     0,     0,    0,    0,
-                                                          0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,     0,     0,     0,    0,    0,
-                                                          0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9,  0,     0,     0,    0,    0,
-                                                          0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     1e-9,  0,     0,    0,    0,
-                                                          0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     1e-9,  0,    0,    0,
-                                                          0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1e-9, 0,    0,
-                                                          0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-9, 0,
-                                                          0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-9]</rosparam>-->
 
     </node>
 </launch>

@@ -3,15 +3,6 @@
     <!-- Set sim time if not using camera -->
     <param name="/use_sim_time" value="true"/>
 
-    <!--IMU Filter Madgwick
-    <node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
-        <param name="use_mag" value="true" />
-        <param name="publish_tf" type="bool" value="false" />
-        <param name="world_frame" type="string" value="enu" />
-        <remap from="/imu/data_raw" to="/imu/data" />
-    </node>-->
-
-
     <!-- MARS ROS to fuse GPS with IMU-->
     <include file="$(find mars_ros)/launch/mars_gps_mag.launch">
         <!-- Input -->
