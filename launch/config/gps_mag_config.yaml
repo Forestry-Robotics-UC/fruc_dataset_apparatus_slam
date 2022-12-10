@@ -1,0 +1,53 @@
+# NOTE: Do not use 1e-6 format because this is reqognized as a string
+
+# Framework Settings
+pub_on_prop: true
+use_ros_time_now: false
+verbose: false
+verbose_out_of_order: true
+discard_ooo_prop_meas: false
+pub_cov: true
+pub_path: false
+buffer_size: 2000
+
+# Ros Settings
+use_tcpnodelay: true
+bypass_init_service: false
+
+pub_cb_buffer_size: 1
+sub_imu_cb_buffer_size: 200
+sub_sensor_cb_buffer_size: 1
+
+# Node specific settings
+publish_gps_enu: true
+enable_manual_yaw_init: false
+
+## Yaw initialization
+yaw_init_deg: -30
+auto_mag_init_samples: 30
+
+# Sensor Settings
+gyro_rate_noise: 0.0023089
+gyro_bias_noise: 0.0012655
+acc_noise: 0.038932
+acc_bias_noise: 0.057518
+
+# Core state covariance p,v,q,bw,ba
+core_init_cov_p: [0.5,0.5,0.5]
+core_init_cov_v: [0.3,0.3,0.3]
+core_init_cov_q: [0.1218,0.1218,0.1218] # 20degree
+core_init_cov_bw: [0.0076,0.0076,0.0076]
+core_init_cov_ba: [0.01,0.01,0.01]
+
+# GPS Settings
+gps1_pos_meas_noise: [0.5,0.5,0.5]
+gps1_vel_meas_noise: [2,2,2]
+gps1_cal_ig: [0,0,0]
+gps1_state_init_cov: [0.00001,0.00001,0.00001]
+
+# Magnetometer Settings
+mag1_normalize: true
+mag1_declination: 0.0 #degree
+mag1_meas_noise: [0.5,0.5,0.5]
+mag1_cal_q_im: [1, 0, 0, 0] # w,x,y,z
+mag1_state_init_cov: [0.25, 0.25, 0.25, 0.0305,0.0305,0.0305] #v_wm q_im

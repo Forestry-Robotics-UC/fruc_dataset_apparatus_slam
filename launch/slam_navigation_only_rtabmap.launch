@@ -1,0 +1,63 @@
+<launch>
+
+    <!-- Set sim time if not using camera -->
+    <param name="/use_sim_time" value="true"/>
+    <!--
+    <node pkg="image_transport" 
+		  type="republish" 
+		  name="realsense_rgb" 
+		  args="compressed in:=/realsense/color/image_raw
+		  		raw out:=/realsense/color/image_raw"/> 
+	
+    <node pkg="image_transport" 
+		  type="republish" 
+		  name="realsense_depth" 
+		  args="compressedDepth in:=/realsense/aligned_depth_to_color/image_raw
+		        raw out:=/realsense/aligned_depth_to_color/image_raw"/> -->
+
+    <!--IMU Filter Madgwick
+    <node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
+        <param name="use_mag" value="true" />
+        <param name="publish_tf" type="bool" value="false" />
+        <param name="world_frame" type="string" value="enu" />
+        <remap from="/imu/data_raw" to="/imu/data" />
+    </node>-->
+
+
+    <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+        <arg name="depth"  value="true"/>
+        <arg name="args" value="--delete_db_on_start --Optimizer/GravitySigma 0.3"/>
+        <arg name="rgb_topic" value="/realsense/color/image_raw"/>
+        
+        <arg name="depth_topic" default="/realsense/aligned_depth_to_color/image_raw" />
+        
+        <arg name="camera_info_topic" value="/realsense/color/camera_info"/>
+        <arg name="depth_camera_info_topic" default="/realsense/aligned_depth_to_color/camera_info" />
+        <param name="depth_image_topic" value="/realsense/aligned_depth_to_color/image_raw" />
+        
+        <arg name="visual_odometry" value="false"/>
+        <arg name="icp_odometry" default="false"/>
+
+        <arg name="rtabmapviz" value="false"/>
+        <arg name="rviz" value="true"/>
+        <arg name="frame_id" value="base_link"/>
+
+        <!--<arg name="subscribe_rgbd" value="true"/>-->
+        
+        <arg name="scan_cloud_topic" value="/livox/lidar"/>
+
+        <arg name="compressed" default="true"/>
+
+        <arg name="approx_sync" value="true"/>
+        <arg name="approx_sync_max_interval"  default="0"/>
+
+        <param name="Odom/ResetCountdown" value="1"/>
+
+        <!-- Dont use GPS here!-->
+        <arg name="gps_topic" default="/mimix3/gps/assisted" /> 
+        <param name="publish_null_when_lost" value="false"/>
+        <param name="Odom/ResetCountdown" value="1"/>
+    </include>
+
+
+</launch>

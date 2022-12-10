@@ -1,0 +1,34 @@
+<launch>
+
+    <!-- Set sim time if not using camera -->
+    <param name="/use_sim_time" value="true"/>
+    
+    <node pkg="image_transport" 
+		  type="republish" 
+		  name="realsense_rgb" 
+		  args="compressed in:=/realsense/color/image_raw
+		  		raw out:=/realsense/color/image_raw"/> 
+	
+    <node pkg="image_transport" 
+		  type="republish" 
+		  name="realsense_depth" 
+		  args="compressedDepth in:=/realsense/aligned_depth_to_color/image_raw
+		        raw out:=/realsense/aligned_depth_to_color/image_raw"/>
+
+    <!--IMU Filter Madgwick
+    <node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
+        <param name="use_mag" value="true" />
+        <param name="publish_tf" type="bool" value="false" />
+        <param name="world_frame" type="string" value="enu" />
+        <remap from="/imu/data_raw" to="/imu/data" />
+    </node>-->
+
+
+    <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch" />
+
+    <include file="$(find fruc_dataset_apparatus_slam)/launch/mars_localization.launch" />
+
+    <include file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" />
+
+
+</launch>
