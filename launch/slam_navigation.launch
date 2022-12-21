@@ -14,13 +14,61 @@
 		  name="realsense_depth" 
 		  args="compressedDepth in:=/realsense/aligned_depth_to_color/image_raw
 		        raw out:=/realsense/aligned_depth_to_color/image_raw"/>
+	
+	<node pkg="image_transport" 
+	  type="republish" 
+	  name="mynteye_left" 
+	  args="compressed in:=mynteye/left_rect/image_rect
+	  		raw out:=mynteye/left_rect/image_rect"/> 
+	
+	<node pkg="image_transport" 
+	  type="republish" 
+	  name="mynteye_right" 
+	  args="compressed in:=mynteye/right_rect/image_rect
+	  		raw out:=mynteye/right_rect/image_rect"/> 
+
+	<node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
+
+	<!-- Generate Mynteye's Point Cloud from Depth-->
+  	<node pkg="nodelet" type="nodelet" name="mynt_depth2cloud"
+  	      args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager">
+  	  <remap from="rgb/camera_info" to="/realsense/color/camera_info"/>
+  	  <remap from="rgb/image_rect_color" to="/realsense/color/image_raw"/>
+
+	  <remap from="depth_registered/image_rect" to="/realsense/aligned_depth_to_color/image_raw"/>
+  	  <remap from="depth_registered/points" to="/realsense/depth/points"/>
+  	</node>
+	
+	<!-- Generate Realsense's Point Cloud from Depth-->
+	<node pkg="nodelet" type="nodelet" name="realsense_depth2cloud"
+  	      args="load depth_image_proc/point_cloud_xyz nodelet_manager">
+  	  <remap from="camera_info" to="/mynteye/depth/camera_info"/>
+  	  <remap from="image_rect" to="/mynteye/depth/image_raw"/>
+  	  <remap from="points" to="/mynteye/depth/points"/>
+  	</node>
+
+	<!--<include file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch"/>-->
 
 
-    <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch" />
+    <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch">
+		<arg name="enable_rgbd_odom"  value="true" />
+    	<arg name="enable_stereo_odom" value="true" />
+    	<arg name="enable_slam" 	  value="true" />
 
-    <include file="$(find fruc_dataset_apparatus_slam)/launch/mars_localization.launch" />
+		<arg name="odom_topic" value="/odometry/filtered"/>
+		<arg name="enable_gps" value="false" />
+	</include>
 
-    <include file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" />
+    <!--<include file="$(find fruc_dataset_apparatus_slam)/launch/mars_localization.launch" />-->
+
+    <include file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" >
+		<arg name="enable_imu_filter"       value="false" />
+		
+		<arg name="enable_imu0"  value="true"/>
+		<arg name="enable_odom0" value="true"/>
+		<!--<arg name="odom0_topic" value="/stereo_odom"/>-->
+		<arg name="enable_odom1" value="false"/>
+	</include>
 
 
 </launch>

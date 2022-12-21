@@ -3,68 +3,58 @@
     <!-- Set sim time if not using camera -->
     <param name="/use_sim_time" value="true"/>
 
+    <!--Filtering the IMU-->
+    <arg name="enable_imu_filter"       default="false" />
+    <arg name="use_mag"       default="true" />
+    <arg name="publish_tf"    default="false" />
+    <arg name="world_frame"   default="enu" />
+
+    <arg name="enable_imu0" default="true"/>    
+    <arg name="enable_odom0" default="true"/>
+    <arg name="enable_odom1" default="true"/>
+
+    <arg name="imu0_topic"  default="/imu/data"/>
+    <arg name="odom0_topic" default="/rgbd_odom"/>
+    <arg name="odom1_topic" default="/stereo_odom"/>
+
     <arg name="frame_id"               default="base_link" />
-    <arg name="imu_topic"               default="/imu/data" />
-    <arg name="imu_ignore_acc"          default="true" />
-    <arg name="imu_remove_gravitational_acceleration" default="false" />
 
  <!-- Odometry fusion (UKF), refer to demo launch file in robot_localization for more info -->
-  <node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization" clear_params="true" output="screen">
 
-      <param name="frequency" value="50"/>
-      <param name="sensor_timeout" value="0.1"/>
-      <param name="two_d_mode" value="false"/>
+        <node if="$(arg enable_imu_filter)" pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
+            <param name="use_mag"       type="bool" value="$(arg use_mag)" />
+            <param name="publish_tf"    type="bool" value="$(arg publish_tf)" />
+            <param name="world_frame"   type="string" value="$(arg world_frame)" />
+            <remap from="/imu/data" to="/imu/filtered/data"/>
+            <remap from="/imu/data_raw" to="$(arg imu0_topic)" />
+        </node>
+        
+        <node pkg="robot_localization" type="ukf_localization_node" name="ukf_localization" clear_params="true" output="screen">
 
-      <param name="odom_frame" value="odom"/>
-      <param name="base_link_frame" value="$(arg frame_id)"/>
-      <param name="world_frame" value="odom"/>
+          <param name="frequency" value="50"/>
+          <param name="sensor_timeout" value="0.1"/>
+          <param name="two_d_mode" value="false"/>
 
-      <param name="transform_time_offset" value="0.0"/>
+          <param name="odom_frame" value="odom"/>
+          <param name="base_link_frame" value="$(arg frame_id)"/>
+          <param name="world_frame" value="odom"/>
 
-      <param name="odom0" value="/visual_odom"/>
-      <param name="odom1" value="/mars_gps_mag_node/odom_state_out"/>
-      <param name="imu0" value="$(arg imu_topic)"/> 
+          <param name="transform_time_offset" value="0.0"/>
 
-      <!-- The order of the values is x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az. -->
-      <rosparam param="odom0_config">[true, true, true,
-                                      true, true, true,
-                                      true, true, true,
-                                      false, false, false,
-                                      true, true, true]</rosparam>
-      
-      <rosparam param="odom1_config">[true, true, true,
-                                      true, true, true,
-                                      true, true, true,
-                                      false, false, false,
-                                      false, false, false]</rosparam>
+          <rosparam if="$(arg enable_imu0)" file="$(find fruc_dataset_apparatus_slam)/launch/config/robot_localization/imu0_config.yml" command="load"/>
+          <param if="$(arg enable_imu0)" name="imu0" value="/imu/data"/>
+          
+          <rosparam if="$(arg enable_odom0)" file="$(find fruc_dataset_apparatus_slam)/launch/config/robot_localization/odom0_config.yml" command="load"/>
+          <param if="$(arg enable_odom0)" name="odom0" value="$(arg odom0_topic)"/>
+          
+          <rosparam if="$(arg enable_odom1)" file="$(find fruc_dataset_apparatus_slam)/launch/config/robot_localization/odom1_config.yml" command="load"/>
+          <param if="$(arg enable_odom1)" name="odom1" value="$(arg odom1_topic)"/>
 
-      <rosparam if="$(arg imu_ignore_acc)" param="imu0_config">[
-                                     false, false, false,
-                                     true,  true,  true,
-                                     false, false, false,
-                                     true,  true,  true,
-                                     false,  false,  false] </rosparam>
-      <rosparam unless="$(arg imu_ignore_acc)" param="imu0_config">[
-                                     false, false, false,
-                                     true,  true,  true,
-                                     false, false, false,
-                                     true,  true,  true,
-                                     true,  true,  true] </rosparam>  
-      
-      <param name="odom0_differential" value="false"/>
-      <param name="imu0_differential" value="false"/>
+          <param name="print_diagnostics" value="true"/>
 
-      <param name="odom0_relative" value="false"/>
-      <param name="odom1_relative" value="true"/>
-      <param name="imu0_relative" value="true"/>
+        </node>
 
-      <param name="imu0_remove_gravitational_acceleration" value="$(arg imu_remove_gravitational_acceleration)"/>
 
-      <param name="print_diagnostics" value="true"/>
 
-      <!-- ======== ADVANCED PARAMETERS ======== -->
-      <param name="odom0_queue_size" value="5"/>
-      <param name="imu0_queue_size" value="50"/> 
 
-    </node>
 </launch>

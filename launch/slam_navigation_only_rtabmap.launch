@@ -14,7 +14,7 @@
         <arg name="depth_camera_info_topic" default="/realsense/aligned_depth_to_color/camera_info" />
         <param name="depth_image_topic" value="/realsense/aligned_depth_to_color/image_raw" />
         
-        <arg name="visual_odometry" value="false"/>
+        <arg name="visual_odometry" value="true"/>
         <arg name="icp_odometry" default="false"/>
 
         <arg name="rtabmapviz" value="false"/>

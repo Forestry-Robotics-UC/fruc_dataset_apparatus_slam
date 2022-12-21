@@ -1,36 +1,51 @@
 <launch>
 
-    <arg name="frame_id"                  default="base_link" />
+    <arg name="frame_id" default="base_link" />
+    <arg name="enable_rgbd_odom" default="true" />
+    <arg name="enable_stereo_odom" default="false" />
+    <arg name="enable_slam" default="true" />
     
-    <arg name="depth" value="true"/>
-    <arg name="rgb_topic" value="/realsense/color/image_raw"/>
+    <!--ODOMETRY ARGUMENTS-->
+    
+    <!-- rgbd odom-->
+    <arg name="depth" default="true"/>
+    <arg name="rgb_topic" default="/realsense/color/image_raw"/>
     <arg name="depth_topic" default="/realsense/aligned_depth_to_color/image_raw" />
-    <arg name="camera_info_topic" value="/realsense/color/camera_info"/>
+    <arg name="camera_info_topic" default="/realsense/color/camera_info"/>
     <arg name="depth_camera_info_topic" default="/realsense/aligned_depth_to_color/camera_info" />
-    
+    <arg name="rgbd_odom_topic" default="/rgbd_odom"/>
     <arg name="compressed"                default="false"/>
     <arg name="approx_sync"               default="true"/>
     <arg name="approx_sync_max_interval"  default="0"/>
+    
+    <!-- stereo odom-->
+    <arg name="left_image_topic"   default="/mynteye/left_rect/image_rect"/>
+    <arg name="right_image_topic"  default="/mynteye/right_rect/image_rect"/>
+    <arg name="left_camera_info_topic"  default="/mynteye/left_rect/camera_info"/>
+    <arg name="right_camera_info_topic" default="/mynteye/right_rect/camera_info"/>
+    <arg name="stereo_odom_topic"            default="/stereo_odom"/>
+    
+    <!-- MAPPING AND LOCALIZATION ARGUMENTS-->
     <arg name="odom_topic"                default="/odometry/filtered"/>
 
-    <!--GPS topic-->
+    <!--GPS-->
     <arg name="enable_gps" default="true" />
     <arg if="$(arg enable_gps)" name="gps_topic" default="/mimix3/gps/assisted"/>
     <arg unless="$(arg enable_gps)" name="gps_topic" default=""/>  
 
-    <!-- Localization-only mode -->
+    <!-- localization-only mode -->
     <arg name="localization"      default="false"/>
     <arg     if="$(arg localization)" name="rtabmap_args"  default=""/>
     <arg unless="$(arg localization)" name="rtabmap_args"  default="--delete_db_on_start"/>  
     
     <group ns="rtabmap">
         <!-- Visual Odometry RGB-->
-        <node pkg="rtabmap_ros" type="rgbd_odometry" name="visual_odometry" output="screen" args="$(arg rtabmap_args)">
+        <node if="$(arg enable_rgbd_odom)" pkg="rtabmap_ros" type="rgbd_odometry" name="rgbd_odometry" output="screen" args="$(arg rtabmap_args)">
 
             <remap from="rgb/image"       to="$(arg rgb_topic)"/>
             <remap from="depth/image"     to="$(arg depth_topic)"/>
             <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
-            <remap from="odom"            to="/visual_odom"/>            
+            <remap from="odom"            to="$(arg rgbd_odom_topic)"/>            
 
             <param name="frame_id"               type="string" value="$(arg frame_id)"/>
             <param name="publish_tf"             type="bool"   value="false"/>
@@ -44,24 +59,38 @@
             <param name="Odom/ResetCountdown"    type="string" value="1"/>
         </node>
 
+        <!-- Stereo Odometry TODO-->
+        <node if="$(arg enable_stereo_odom)" pkg="rtabmap_ros" type="stereo_odometry" name="stereo_odometry" output="screen" args="$(arg rtabmap_args)">
+            <remap from="left/image_rect"   to="$(arg left_image_topic)"/>
+            <remap from="right/image_rect"  to="$(arg right_image_topic)"/>
+            <remap from="left/camera_info"  to="$(arg left_camera_info_topic)"/>
+            <remap from="right/camera_info" to="$(arg right_camera_info_topic)"/>
+            <remap from="odom"              to="$(arg stereo_odom_topic)"/>
+            
+            <param name="frame_id"               type="string" value="$(arg frame_id)"/>
+            <param name="publish_tf"             type="bool"   value="false"/>
+            <param name="publish_null_when_lost" type="bool"   value="false"/>
+            <param name="queue_size"      type="int"    value="50"/>
+        </node>
+
+
         <!-- SLAM -->
-        <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
+        <node if="$(arg enable_slam)" name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
             <param name="frame_id"        type="string" value="$(arg frame_id)"/>
     
             <remap from="rgb/image"       to="$(arg rgb_topic)"/>
             <remap from="depth/image"     to="$(arg depth_topic)"/>
             <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
             <remap from="odom"            to="$(arg odom_topic)"/>
-            <remap from="gps/fix"                to="$(arg gps_topic)"/>
+            <remap if="$(arg enable_gps)" from="gps/fix"                to="$(arg gps_topic)"/>
     
-            <param name="Kp/DetectorStrategy"    type="string" value="6"/> <!-- use same features as odom -->
+            <!--<param name="Kp/DetectorStrategy"    type="string" value="6"/>-->
     
             <!-- localization mode -->
             <param name="Mem/InitWMWithAllNodes" type="string" value="$(arg localization)"/> 
             <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
             <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
 
-            <!-- With GPS TODO-->
         </node>
 
     </group>
