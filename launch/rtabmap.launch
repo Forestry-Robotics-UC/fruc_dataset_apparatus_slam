@@ -92,8 +92,6 @@
             <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
 
         </node>
-
     </group>
-
 
 </launch>

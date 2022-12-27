@@ -3,6 +3,7 @@
     <!-- Set sim time if not using camera -->
     <param name="/use_sim_time" value="true"/>
     
+	<!--TODO: Add these to a node group-->
     <node pkg="image_transport" 
 		  type="republish" 
 		  name="realsense_rgb" 
@@ -29,6 +30,7 @@
 
 	<node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
 
+	<!--TODO: Add these to a node group-->
 	<!-- Generate Mynteye's Point Cloud from Depth-->
   	<node pkg="nodelet" type="nodelet" name="mynt_depth2cloud"
   	      args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager">
@@ -47,12 +49,17 @@
   	  <remap from="points" to="/mynteye/depth/points"/>
   	</node>
 
-	<!--<include file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch"/>-->
+	<!-- Publish every Point Cloud into the same topic -->
+	<node pkg="topic_tools" type="relay" name="livox_relay" args="/livox/lidar /cloud"/>
+	<node pkg="topic_tools" type="relay" name="mynt_relay" args="/mynteye/depth/points /cloud"/>
+	<node pkg="topic_tools" type="relay" name="realsense_relay" args="/realsense/depth/points /cloud"/>
 
+
+	<!--<include file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch"/>-->
 
     <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch">
 		<arg name="enable_rgbd_odom"  value="true" />
-    	<arg name="enable_stereo_odom" value="true" />
+    	<arg name="enable_stereo_odom" value="false" />
     	<arg name="enable_slam" 	  value="true" />
 
 		<arg name="odom_topic" value="/odometry/filtered"/>
@@ -62,13 +69,22 @@
     <!--<include file="$(find fruc_dataset_apparatus_slam)/launch/mars_localization.launch" />-->
 
     <include file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" >
-		<arg name="enable_imu_filter"       value="false" />
+		<arg name="enable_imu_filter"       value="true" />
 		
 		<arg name="enable_imu0"  value="true"/>
 		<arg name="enable_odom0" value="true"/>
-		<!--<arg name="odom0_topic" value="/stereo_odom"/>-->
+		<arg name="odom0_topic" value="/rgbd_odom"/>
 		<arg name="enable_odom1" value="false"/>
 	</include>
 
+
+	<node pkg="octomap_server" type="octomap_server_node" name="octomap_node" output="screen">
+		<param name="resolution" value="0.05" />
+		<param name="frame_id" value="map" />
+		<param name="sensor_model/max_range" value="5" />
+		
+		<remap from="cloud_in" to="/cloud"/>
+
+	</node>
 
 </launch>
