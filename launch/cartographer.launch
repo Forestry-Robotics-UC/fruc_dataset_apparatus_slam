@@ -1,6 +1,7 @@
 
 <launch>
 
+
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find fruc_dataset_apparatus_slam)/launch/config/
@@ -9,7 +10,8 @@
       output="screen">
     <remap from="points2_1" to="/livox/lidar" />
     <remap from="points2_2" to="/mynteye/depth/points" />
-    <remap from="imu" to="/imu/data" />
+    <remap from="points2_2" to="/realsense/depth/points" />
+    <remap from="imu" to="/imu/filtered/data" />
   </node>
 
   <!--<node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
