@@ -12,10 +12,12 @@
     <arg name="enable_imu0" default="true"/>    
     <arg name="enable_odom0" default="true"/>
     <arg name="enable_odom1" default="true"/>
+    <arg name="enable_odom2" default="true"/>
 
     <arg name="imu0_topic"  default="/imu/data"/>
     <arg name="odom0_topic" default="/rgbd_odom"/>
     <arg name="odom1_topic" default="/stereo_odom"/>
+    <arg name="odom2_topic" default="/icp_odom"/>
 
     <arg name="frame_id"               default="base_link" />
 
@@ -49,6 +51,9 @@
           
           <rosparam if="$(arg enable_odom1)" file="$(find fruc_dataset_apparatus_slam)/launch/config/robot_localization/odom1_config.yml" command="load"/>
           <param if="$(arg enable_odom1)" name="odom1" value="$(arg odom1_topic)"/>
+
+          <rosparam if="$(arg enable_odom2)" file="$(find fruc_dataset_apparatus_slam)/launch/config/robot_localization/odom2_config.yml" command="load"/>
+          <param if="$(arg enable_odom2)" name="odom2" value="$(arg odom2_topic)"/>
 
           <param name="print_diagnostics" value="true"/>
 

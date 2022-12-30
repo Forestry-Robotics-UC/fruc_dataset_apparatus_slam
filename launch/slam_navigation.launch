@@ -60,9 +60,10 @@
     <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch">
 		<arg name="enable_rgbd_odom"  value="true" />
     	<arg name="enable_stereo_odom" value="false" />
+		<arg name="enable_icp_odom" value="false" />
     	<arg name="enable_slam" 	  value="true" />
 
-		<arg name="odom_topic" value="/odometry/filtered"/>
+		<arg name="odom_topic" value="/icp_odometry/filtered"/>
 		<arg name="enable_gps" value="false" />
 	</include>
 
@@ -75,6 +76,7 @@
 		<arg name="enable_odom0" value="true"/>
 		<arg name="odom0_topic" value="/rgbd_odom"/>
 		<arg name="enable_odom1" value="false"/>
+		<arg name="enable_odom2" value="false"/>
 	</include>
 
 

@@ -3,6 +3,7 @@
     <arg name="frame_id" default="base_link" />
     <arg name="enable_rgbd_odom" default="true" />
     <arg name="enable_stereo_odom" default="false" />
+    <arg name="enable_icp_odom" default="false" />
     <arg name="enable_slam" default="true" />
     
     <!--ODOMETRY ARGUMENTS-->
@@ -24,7 +25,11 @@
     <arg name="left_camera_info_topic"  default="/mynteye/left_rect/camera_info"/>
     <arg name="right_camera_info_topic" default="/mynteye/right_rect/camera_info"/>
     <arg name="stereo_odom_topic"            default="/stereo_odom"/>
-    
+
+    <!-- ICP odom-->
+    <arg name="scan_cloud_topic"   default="/realsense/depth/points"/>
+    <arg name="icp_odom_topic"     default="/icp_odom"/>
+
     <!-- MAPPING AND LOCALIZATION ARGUMENTS-->
     <arg name="odom_topic"                default="/odometry/filtered"/>
 
@@ -71,8 +76,24 @@
             <param name="publish_tf"             type="bool"   value="false"/>
             <param name="publish_null_when_lost" type="bool"   value="false"/>
             <param name="queue_size"      type="int"    value="50"/>
+
+            <param name="Odom/FillInfoData"      type="string" value="true"/>
+            <param name="Odom/ResetCountdown"    type="string" value="1"/>
         </node>
 
+        <!-- ICP Odometry TODO-->
+        <node if="$(arg enable_icp_odom)" pkg="rtabmap_ros" type="icp_odometry" name="icp_odometry" output="screen" args="$(arg rtabmap_args)">
+            <remap from="scan_cloud"   to="$(arg scan_cloud_topic)"/>
+            <remap from="odom"              to="$(arg icp_odom_topic)"/>
+            
+            <param name="frame_id"               type="string" value="$(arg frame_id)"/>
+            <param name="publish_tf"             type="bool"   value="false"/>
+            <param name="publish_null_when_lost" type="bool"   value="false"/>
+            <param name="queue_size"      type="int"    value="50"/>
+
+            <param name="Odom/FillInfoData"      type="string" value="true"/>
+            <param name="Odom/ResetCountdown"    type="string" value="1"/>
+        </node>
 
         <!-- SLAM -->
         <node if="$(arg enable_slam)" name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
