@@ -1,73 +1,29 @@
 <launch>
 
-    <!-- Set sim time if not using camera -->
-    <param name="/use_sim_time" value="true"/>
-    
-	<!--TODO: Add these to a node group-->
-    <node pkg="image_transport" 
-		  type="republish" 
-		  name="realsense_rgb" 
-		  args="compressed in:=/realsense/color/image_raw
-		  		raw out:=/realsense/color/image_raw"/> 
-	
-    <node pkg="image_transport" 
-		  type="republish" 
-		  name="realsense_depth" 
-		  args="compressedDepth in:=/realsense/aligned_depth_to_color/image_raw
-		        raw out:=/realsense/aligned_depth_to_color/image_raw"/>
-	
-	<node pkg="image_transport" 
-	  type="republish" 
-	  name="mynteye_left" 
-	  args="compressed in:=mynteye/left_rect/image_rect
-	  		raw out:=mynteye/left_rect/image_rect"/> 
-	
-	<node pkg="image_transport" 
-	  type="republish" 
-	  name="mynteye_right" 
-	  args="compressed in:=mynteye/right_rect/image_rect
-	  		raw out:=mynteye/right_rect/image_rect"/> 
+	<!--<include file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch"/>
 
-	<node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
-
-	<!--TODO: Add these to a node group-->
-	<!-- Generate Mynteye's Point Cloud from Depth-->
-  	<node pkg="nodelet" type="nodelet" name="mynt_depth2cloud"
-  	      args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager">
-  	  <remap from="rgb/camera_info" to="/realsense/color/camera_info"/>
-  	  <remap from="rgb/image_rect_color" to="/realsense/color/image_raw"/>
-
-	  <remap from="depth_registered/image_rect" to="/realsense/aligned_depth_to_color/image_raw"/>
-  	  <remap from="depth_registered/points" to="/realsense/depth/points"/>
-  	</node>
-	
-	<!-- Generate Realsense's Point Cloud from Depth-->
-	<node pkg="nodelet" type="nodelet" name="realsense_depth2cloud"
-  	      args="load depth_image_proc/point_cloud_xyz nodelet_manager">
-  	  <remap from="camera_info" to="/mynteye/depth/camera_info"/>
-  	  <remap from="image_rect" to="/mynteye/depth/image_raw"/>
-  	  <remap from="points" to="/mynteye/depth/points"/>
-  	</node>
-
-	<!-- Publish every Point Cloud into the same topic -->
-	<node pkg="topic_tools" type="relay" name="livox_relay" args="/livox/lidar /cloud"/>
-	<node pkg="topic_tools" type="relay" name="mynt_relay" args="/mynteye/depth/points /cloud"/>
-	<node pkg="topic_tools" type="relay" name="realsense_relay" args="/realsense/depth/points /cloud"/>
-
-
-	<!--<include file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch"/>-->
+    <include file="$(find livox_mapping)/launch/mapping_mid.launch" ns="livoxmapping">
+        <arg name="rviz" value="false" />
+    </include>-->
 
     <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch">
 		<arg name="enable_rgbd_odom"  value="true" />
-    	<arg name="enable_stereo_odom" value="false" />
-		<arg name="enable_icp_odom" value="false" />
+    	<arg name="enable_stereo_odom" value="true" />
+		
+		<!--<arg name="left_image_topic" value="/mynteye_proc/left/image_rect"  />
+		<arg name="right_image_topic" value="/mynteye_proc/right/image_rect"/>
+		<arg name="left_camera_info_topic" value="/mynteye/left/camera_info"/>
+		<arg name="right_camera_info_topic" value="/mynteye/right/camera_info"/>-->
+		
+		<arg name="enable_icp_odom" value="true" />
+		<arg name="scan_cloud_topic"   value="/mynteye/depth/points"/>
     	<arg name="enable_slam" 	  value="true" />
 
-		<arg name="odom_topic" value="/icp_odometry/filtered"/>
+		<arg name="odom_topic" value="/odometry/filtered"/>
 		<arg name="enable_gps" value="false" />
 	</include>
 
-    <!--<include file="$(find fruc_dataset_apparatus_slam)/launch/mars_localization.launch" />-->
+    <include file="$(find fruc_dataset_apparatus_slam)/launch/mars_single_odom.launch" />
 
     <include file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" >
 		<arg name="enable_imu_filter"       value="true" />
@@ -75,8 +31,10 @@
 		<arg name="enable_imu0"  value="true"/>
 		<arg name="enable_odom0" value="true"/>
 		<arg name="odom0_topic" value="/rgbd_odom"/>
-		<arg name="enable_odom1" value="false"/>
+		<arg name="enable_odom1" value="true"/>
+		<arg name="odom1_topic" value="/aft_mapped_to_init"/>
 		<arg name="enable_odom2" value="false"/>
+		<arg name="odom2_topic" value="/icp_odom"/>
 	</include>
 
 
