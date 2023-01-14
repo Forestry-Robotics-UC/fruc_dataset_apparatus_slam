@@ -1,0 +1,6 @@
+<launch>
+    <include file="$(find livox_mapping)/launch/mapping_mid.launch" ns="livoxmapping">
+        <arg name="rviz" value="true" />
+    </include>
+
+</launch>
