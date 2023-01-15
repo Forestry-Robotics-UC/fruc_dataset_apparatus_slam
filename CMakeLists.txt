@@ -7,7 +7,7 @@ project(fruc_dataset_apparatus_slam)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs tf)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -113,7 +113,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-# ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -129,7 +129,9 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/fruc_dataset_apparatus_slam_node.cpp)
+add_executable(listen_tf_publish_odom src/listen_tf_publish_odom.cpp)
+target_link_libraries(listen_tf_publish_odom ${catkin_LIBRARIES})
+#add_dependencies(${PROJECT_NAME} )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
