@@ -7,7 +7,7 @@ project(fruc_dataset_apparatus_slam)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs tf)
+find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs nav_msgs tf)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -131,6 +131,9 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(listen_tf_publish_odom src/listen_tf_publish_odom.cpp)
 target_link_libraries(listen_tf_publish_odom ${catkin_LIBRARIES})
+
+add_executable(subscribe_odom_publish_tf src/subscribe_odom_publish_tf.cpp)
+target_link_libraries(subscribe_odom_publish_tf ${catkin_LIBRARIES})
 #add_dependencies(${PROJECT_NAME} )
 
 ## Rename C++ executable without prefix
@@ -157,10 +160,10 @@ target_link_libraries(listen_tf_publish_odom ${catkin_LIBRARIES})
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# catkin_install_python(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+catkin_install_python(PROGRAMS
+   script/fix_odom_frames.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
