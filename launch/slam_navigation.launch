@@ -1,31 +1,29 @@
 <launch>
 
-	<!--<include file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch"/>
-
+	<arg name="enable_robot_localization"       value="true" />
+	<arg name="enable_cartographer"       value="false" />
+	<arg name="enable_mars"       value="false" />
+ 
     <include file="$(find livox_mapping)/launch/mapping_mid.launch" ns="livoxmapping">
         <arg name="rviz" value="false" />
-    </include>-->
+    </include>
 
     <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch">
 		<arg name="enable_rgbd_odom"  value="true" />
     	<arg name="enable_stereo_odom" value="true" />
-		
-		<!--<arg name="left_image_topic" value="/mynteye_proc/left/image_rect"  />
-		<arg name="right_image_topic" value="/mynteye_proc/right/image_rect"/>
-		<arg name="left_camera_info_topic" value="/mynteye/left/camera_info"/>
-		<arg name="right_camera_info_topic" value="/mynteye/right/camera_info"/>-->
-		
 		<arg name="enable_icp_odom" value="true" />
-		<arg name="scan_cloud_topic"   value="/mynteye/depth/points"/>
+
     	<arg name="enable_slam" 	  value="true" />
 
 		<arg name="odom_topic" value="/odometry/filtered"/>
 		<arg name="enable_gps" value="false" />
 	</include>
 
-    <include file="$(find fruc_dataset_apparatus_slam)/launch/mars_single_odom.launch" />
+	<include if="$(arg enable_cartographer)" file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch" ns="cartographer"/>
 
-    <include file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" >
+    <include if="$(arg enable_mars)" file="$(find fruc_dataset_apparatus_slam)/launch/mars_single_odom.launch" />
+
+    <include if="$(arg enable_robot_localization)" file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" >
 		<arg name="enable_imu_filter"       value="true" />
 		
 		<arg name="enable_imu0"  value="true"/>
@@ -37,14 +35,20 @@
 		<arg name="odom2_topic" value="/icp_odom"/>
 	</include>
 
-
-	<node pkg="octomap_server" type="octomap_server_node" name="octomap_node" output="screen">
+	<!--<node pkg="octomap_server" type="octomap_server_node" name="octomap_node" ns="octomap_server" output="screen">
 		<param name="resolution" value="0.05" />
-		<param name="frame_id" value="map" />
-		<param name="sensor_model/max_range" value="5" />
-		
-		<remap from="cloud_in" to="/cloud"/>
-
+		<param name="frame_id" value="cartographer_odom" />
+		<param name="sensor_model/max_range" value="7" />
+		<remap from="cloud_in" to="/realsense/depth/points"/>
 	</node>
+
+	<node pkg="octomap_server" type="octomap_server_node" name="octomap_node_mynt" ns="octomap_server_mynt" output="screen">
+		<param name="resolution" value="0.05" />
+		<param name="frame_id" value="cartographer_odom" />
+		<param name="sensor_model/max_range" value="7" />
+		<remap from="cloud_in" to="/mynteye/depth/points"/>
+	</node>-->
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find fruc_dataset_apparatus_slam)/rviz/slam.rviz" />
 
 </launch>

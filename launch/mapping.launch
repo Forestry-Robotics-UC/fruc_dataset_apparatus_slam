@@ -1,0 +1,33 @@
+<launch>
+
+	<node name="odom_to_tf" pkg="fruc_dataset_apparatus_slam" type="subscribe_odom_publish_tf"
+      output="screen">
+        <remap from="odom" to="/localization"/>
+    </node>
+
+	<!--<node pkg="octomap_server" type="octomap_server_node" name="octomap_livox" ns="octomap_server_livox" output="screen">
+		<param name="resolution" value="0.05" />
+		<param name="frame_id" value="map" />
+        <param name="base_frame_id" value="base_link" />
+		<param name="sensor_model/max_range" value="10" />
+		<remap from="cloud_in" to="/livox/lidar"/>
+	</node>
+    <node pkg="octomap_server" type="octomap_server_node" name="octomap_server" output="screen">
+		<param name="resolution" value="0.05" />
+		<param name="frame_id" value="map" />
+        <param name="base_frame_id" value="base_link" />
+		<param name="sensor_model/max_range" value="5" />
+		<remap from="cloud_in" to="/mynteye/depth/points"/>
+	</node>-->
+    <node pkg="octomap_server" type="octomap_server_node" name="octomap_d435i" output="screen">
+		<param name="resolution" value="0.05" />
+		<param name="frame_id" value="map" />
+        <param name="base_frame_id" value="base_link" />
+		<param name="sensor_model/max_range" value="7" />
+		<remap from="cloud_in" to="/realsense/depth/points"/>
+	</node>
+
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find fruc_dataset_apparatus_slam)/rviz/mapping.rviz" />
+
+</launch>

@@ -4,7 +4,7 @@
     <param name="/use_sim_time" value="true"/>
 
     <!--Filtering the IMU-->
-    <arg name="enable_imu_filter"       default="false" />
+    <arg name="enable_imu_filter"       default="true" />
     <arg name="use_mag"       default="true" />
     <arg name="publish_tf"    default="false" />
     <arg name="world_frame"   default="enu" />
@@ -40,11 +40,11 @@
           <param name="odom_frame" value="odom"/>
           <param name="base_link_frame" value="$(arg frame_id)"/>
           <param name="world_frame" value="odom"/>
+          <param name="publish_tf" value="true"/>
 
           <param name="transform_time_offset" value="0.0"/>
 
           <rosparam if="$(arg enable_imu0)" file="$(find fruc_dataset_apparatus_slam)/launch/config/robot_localization/imu0_config.yml" command="load"/>
-          <param if="$(arg enable_imu0)" name="imu0" value="/imu/data"/>
           
           <rosparam if="$(arg enable_odom0)" file="$(find fruc_dataset_apparatus_slam)/launch/config/robot_localization/odom0_config.yml" command="load"/>
           <param if="$(arg enable_odom0)" name="odom0" value="$(arg odom0_topic)"/>

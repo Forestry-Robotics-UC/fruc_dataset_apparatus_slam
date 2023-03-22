@@ -8,11 +8,13 @@
   <arg name="pose_with_cov_in_topic" default="~pose_with_cov_in" />
   <arg name="odom_in_topic" default="/rgbd_odom" />
 
+  <arg name="parent_id" value="map" />
+
   <!-- Output Core State -->
   <arg name="full_state_out_topic" default="~full_state_out" />
   <arg name="full_state_lite_out_topic" default="~full_state_lite_out" />
   <arg name="pose_state_out_topic" default="~pose_state_out" />
-  <arg name="odom_state_out_topic" default="~odom_state_out" />
+  <arg name="odom_state_out_topic" default="/odometry/filtered" />
   <arg name="path_states_out_topic" default="~path_states_out" />
 
   <!-- Output Calibration State -->
@@ -26,7 +28,7 @@
   <arg name="config_file" default="$(find fruc_dataset_apparatus_slam)/launch/config/mars/single_pose_config.yaml" />
 
   <!-- Launching the mars_ros pose_node -->
-  <node name="mars_pose_node" pkg="mars_ros" type="pose_node" clear_params="true" output="screen" respawn="$(arg respawn)">
+  <node name="mars_pose_node" pkg="mars_ros" type="pose_node" clear_params="true" output="screen" respawn="$(arg respawn)">`
 
     <!-- Config File -->
     <rosparam command="load" file="$(arg config_file)" />
@@ -47,6 +49,11 @@
 
     <!-- Output Calibration State -->
     <remap from="~pose_cal_state_out" to="$(arg pose_cal_state_out_topic)"/>
+  </node>
+
+  <node name="odom_to_tf" pkg="fruc_dataset_apparatus_slam" type="subscribe_odom_publish_tf"
+      output="screen">
+    <remap from="odom" to="/odometry/filtered"/>
   </node>
 
   <!-- launch rviz -->
