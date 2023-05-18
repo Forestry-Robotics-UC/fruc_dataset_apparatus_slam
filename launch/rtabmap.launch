@@ -130,7 +130,8 @@
             <remap from="odom"            to="$(arg odom_topic)"/>
             <remap if="$(arg enable_gps)" from="gps/fix"                to="$(arg gps_topic)"/>
             
-            <param name="Rtabmap/DetectionRate" value="15"/>
+            <param name="Rtabmap/DetectionRate" value="10"/>
+            <param name="Rtabmap/CreateIntermediateNodes" value="true"/>
             <!-- <param name="Kp/WordsPerImage" type="string" value="-1"/>  Turns off loop closure-->
             <!--<param name="approx_sync" value="true"/>
             <param name="Kp/DetectorStrategy"    type="string" value="6"/>-->

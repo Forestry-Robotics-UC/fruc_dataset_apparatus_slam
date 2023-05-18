@@ -3,8 +3,8 @@
 
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
-          -configuration_directory $(find fruc_dataset_apparatus_slam)/launch/config/
-          -configuration_basename cartographer.lua"
+          -configuration_directory $(find fruc_dataset_apparatus_slam)/launch/config/cartographer/
+          -configuration_basename main.lua"
       output="screen">
     <remap from="points2" to="/livox/lidar" />
     <!--<remap from="points2_2" to="/mynteye/depth/points" />

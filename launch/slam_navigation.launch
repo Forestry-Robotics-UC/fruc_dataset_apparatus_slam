@@ -1,7 +1,7 @@
 <launch>
 
 	<arg name="enable_robot_localization"       value="true" />
-	<arg name="enable_cartographer"       value="false" />
+	<arg name="enable_cartographer"       value="true" />
 	<arg name="enable_mars"       value="false" />
  
     <include file="$(find livox_mapping)/launch/mapping_mid.launch" ns="livoxmapping">
@@ -13,7 +13,7 @@
     	<arg name="enable_stereo_odom" value="true" />
 		<arg name="enable_icp_odom" value="true" />
 
-    	<arg name="enable_slam" 	  value="true" />
+    	<arg name="enable_slam" 	  value="false" />
 
 		<arg name="odom_topic" value="/odometry/filtered"/>
 		<arg name="enable_gps" value="false" />
