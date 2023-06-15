@@ -13,10 +13,10 @@
     <remap from="odom" to="/odometry/filtered"/>
   </node>
 
-  <node name="pose_to_odom" pkg="fruc_dataset_apparatus_slam" type="listen_tf_publish_odom"
+  <!--<node name="pose_to_odom" pkg="fruc_dataset_apparatus_slam" type="listen_tf_publish_odom"
       output="screen">
     <remap from="odom" to="/cartographer/cartographer_odom"/>
-  </node>
+  </node>-->
 
   <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
       type="cartographer_occupancy_grid_node" args="-resolution 0.05" />

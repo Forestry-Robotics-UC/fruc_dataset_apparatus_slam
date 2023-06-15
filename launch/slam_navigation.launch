@@ -1,29 +1,19 @@
 <launch>
 
 	<arg name="enable_robot_localization"       value="true" />
-	<arg name="enable_cartographer"       value="true" />
-	<arg name="enable_mars"       value="false" />
- 
-    <include file="$(find livox_mapping)/launch/mapping_mid.launch" ns="livoxmapping">
-        <arg name="rviz" value="false" />
-    </include>
+	<arg name="enable_mars"       default="false" />
+	
+	<!-- For now it is only "rtabmap" or "cartographer" or ""-->
+	<arg name="slam_method" default="cartographer"/>
+	<arg name="sensor_fusion_method" default="robot_localization"/>
+    <arg name="loop_closure" default="true"/>
 
-    <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch">
-		<arg name="enable_rgbd_odom"  value="true" />
-    	<arg name="enable_stereo_odom" value="true" />
-		<arg name="enable_icp_odom" value="true" />
+	<!-- Sensor Fusion Methods-->
+	<!--MaRS - TODO-->
+    <include if="$(eval arg('sensor_fusion_method')=='mars')" file="$(find fruc_dataset_apparatus_slam)/launch/mars_single_odom.launch" />
 
-    	<arg name="enable_slam" 	  value="false" />
-
-		<arg name="odom_topic" value="/odometry/filtered"/>
-		<arg name="enable_gps" value="false" />
-	</include>
-
-	<include if="$(arg enable_cartographer)" file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch" ns="cartographer"/>
-
-    <include if="$(arg enable_mars)" file="$(find fruc_dataset_apparatus_slam)/launch/mars_single_odom.launch" />
-
-    <include if="$(arg enable_robot_localization)" file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" >
+	<!-- ROBOT LOCALIZATION -->
+    <include if="$(eval arg('sensor_fusion_method')=='robot_localization')" file="$(find fruc_dataset_apparatus_slam)/launch/robot_localization.launch" >
 		<arg name="enable_imu_filter"       value="true" />
 		
 		<arg name="enable_imu0"  value="true"/>
@@ -35,19 +25,24 @@
 		<arg name="odom2_topic" value="/icp_odom"/>
 	</include>
 
-	<!--<node pkg="octomap_server" type="octomap_server_node" name="octomap_node" ns="octomap_server" output="screen">
-		<param name="resolution" value="0.05" />
-		<param name="frame_id" value="cartographer_odom" />
-		<param name="sensor_model/max_range" value="7" />
-		<remap from="cloud_in" to="/realsense/depth/points"/>
-	</node>
 
-	<node pkg="octomap_server" type="octomap_server_node" name="octomap_node_mynt" ns="octomap_server_mynt" output="screen">
-		<param name="resolution" value="0.05" />
-		<param name="frame_id" value="cartographer_odom" />
-		<param name="sensor_model/max_range" value="7" />
-		<remap from="cloud_in" to="/mynteye/depth/points"/>
-	</node>-->
+    <include file="$(find livox_mapping)/launch/mapping_mid.launch" ns="livoxmapping">
+        <arg name="rviz" value="false" />
+    </include>
+
+    <include file="$(find fruc_dataset_apparatus_slam)/launch/rtabmap.launch">
+		<arg name="enable_rgbd_odom"  value="true" />
+    	<arg name="enable_stereo_odom" value="true" />
+		<arg name="enable_icp_odom" value="true" />
+
+    	<arg name="enable_slam" 	  value="$(eval arg('slam_method')=='rtabmap')" />
+
+		<arg name="odom_topic" value="/odometry/filtered"/>
+		<arg name="enable_gps" value="false" />
+	</include>
+
+
+	<include if="$(eval arg('slam_method')=='cartographer')" file="$(find fruc_dataset_apparatus_slam)/launch/cartographer.launch" ns="cartographer"/>
 
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find fruc_dataset_apparatus_slam)/rviz/slam.rviz" />
 
